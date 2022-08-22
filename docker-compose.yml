@@ -3,10 +3,11 @@ nginx:
   container_name: nginx-lemp
   ports:
     - 8080:80
+    - 443:443
   links:
     - php
-  volumes_from:
-    - app-src
+  volumes:
+    - ./src/:/var/www/html
 
 php:
   build: ./php/
@@ -15,30 +16,18 @@ php:
     - 9000
   links:
     - mysql
-  volumes_from:
-    - app-src
-
-app-src:
-  image: php:7.4-fpm
-  container_name: app-src
   volumes:
     - ./src/:/var/www/html
-  command: "true"
 
 mysql:
-  image: mysql:5.7
+  build: ./mysql/
   container_name: mysql-lemp
-  volumes_from:
-    - mysql-data
+  ports:
+    - 3306:3306
+  volumes:
+    - ./mysql/data:/var/lib/mysql
   environment:
     MYSQL_ROOT_PASSWORD: rootPass
     MYSQL_DATABASE: db
     MYSQL_USER: userdb
     MYSQL_PASSWORD: userPass
-
-mysql-data:
-  image: mysql:5.7
-  container_name: mysql-data
-  volumes:
-    - /var/lib/mysql
-  command: "true"
